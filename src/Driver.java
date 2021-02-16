@@ -15,7 +15,7 @@ public class Driver
       }
       Scanner curScanner = new Scanner(System.in);
       Game curGame = new Game(debug, curScanner);
-      while (curGame.isGameLoop()){
+      while (curGame.isGameRepeat()){
          System.out.println("Playing Game");
          curGame.runGame();
       }

@@ -1,15 +1,19 @@
 package assignment2;
 
-import java.util.Locale;
 import java.util.Scanner;
 
 
 
 public class Game
 {
-   private boolean gameLoop = true;
-   private boolean debugMode = false;
+   private boolean gameRepeat = true;
+   private boolean playingGame = true;
+   private boolean debugMode;
+   private boolean gameWon = false;
    private Scanner gameScanner;
+   private GameBoard gameBoard;
+   private HumanPlayer player;
+
 
    public Game(boolean debug, Scanner curScanner)
    {
@@ -18,22 +22,121 @@ public class Game
 
    }
 
-   public boolean isGameLoop()
+   public boolean isGameRepeat()
    {
-      return gameLoop;
+      return gameRepeat;
    }
 
    public void runGame(){
       initializeGame();
+      while (playingGame){
+         if(gameWon){ //won
+            boolean prompt = true;
+            while(prompt){
+               prompt = promptExtraGame();
+            }
+         }
+         else if(player.getGuesses() == 0){ //lost
+            System.out.println("(Sorry, you are out of guesses. You lose, boo-hoo.)");
+            boolean prompt = true;
+            while(prompt){
+               prompt = promptExtraGame();
+            }
+            playingGame = false;
+         }
+         else{ //regular turn based gameplay
+            System.out.println("You have " + player.getGuesses() + " guesses left.");
 
+            boolean validGuess = false;
+            while(!validGuess){
+               System.out.println("What is your next guess?");
+               System.out.println("Type in the characters for your guess and press enter.");
+               validGuess = promptGuess();
+            }
+         }
+      }
 
-      gameLoop = false;
+   }
+
+   private boolean promptGuess()
+   {
+      boolean validGuess = true;
+      System.out.print("Enter guess: ");
+      String guess = gameScanner.nextLine();
+      guess = guess.trim();
+      System.out.println();
+      if (guess.length() != GameConfiguration.pegNumber){
+         validGuess = false;
+         return validGuess;
+      }
+      else{
+         for(int i =0; i<guess.length(); ++i){
+            char curChar = guess.charAt(i);
+            boolean validChar = false;
+            for (int j = 0; j < GameConfiguration.colors.length; ++j){
+               if (curChar == GameConfiguration.colors[j].charAt(0))
+               {
+                  validChar = true;
+                  break;
+               }
+            }
+            if(!validChar){
+               validGuess = false;
+            }
+         }
+         processGuess(guess, validGuess);
+         return validGuess;
+      }
+   }
+
+   private void processGuess(String guess, boolean validGuess)
+   {
+      System.out.print(guess + " -> ");
+      if(validGuess){
+         Code codeGuess = new Code(guess);
+         player.setGuess(codeGuess);
+         player.setGuesses(player.getGuesses()-1);
+         System.out.print("Result: ");
+         String result = gameBoard.getSecretCode().calculateFeedback(player.getGuess());
+         System.out.print(result);
+         if(gameBoard.getSecretCode().equals(player.getGuess())){
+            System.out.print(" - You win !!");
+            gameWon = true;
+         }
+         System.out.println();
+      }
+      else{
+         System.out.println("INVALID GUESS");
+      }
+      System.out.println();
+
+   }
+
+   private boolean promptExtraGame()
+   {
+      boolean prompt = true;
+      System.out.print("Are you ready for another game (Y/N) : ");
+      String response = gameScanner.nextLine();
+      response = response.toUpperCase();
+      response = response.trim();
+      if (response.equals("Y") || response.equals("N")){
+         prompt = false;
+         gameRepeat = response.equals("Y");
+         gameWon = false;
+         playingGame = false;
+      }
+      return prompt;
    }
 
    private void initializeGame()
    {
+      playingGame = true;
       printRules();
       Code secretCode = new Code(SecretCodeGenerator.getInstance().getNewSecretCode());
+      boolean ready = false;
+      while (!ready){
+         ready = promptReady();
+      }
       System.out.print("Generating secret code ... ");
       if(debugMode){
          System.out.println("(for this example the secret code is " + secretCode + ")\n");
@@ -41,26 +144,27 @@ public class Game
       else{
          System.out.println("\n");
       }
-      boolean ready = false;
-      while (!ready){
-         ready = promptReady();
-      }
-      if(gameLoop){
-         
+
+      if(playingGame){
+         gameBoard = new GameBoard(secretCode);
+         player = new HumanPlayer();
       }
    }
 
    private boolean promptReady()
    {
       boolean ready = false;
-      System.out.println("You have 12 guesses to figure out the secret code or you lose the\n" +
-         "game. Are you ready to play? (Y/N):");
+      System.out.print("You have 12 guesses to figure out the secret code or you lose the\n" +
+         "game. Are you ready to play? (Y/N): ");
       String response = gameScanner.nextLine();
       response = response.toUpperCase();
+      response = response.trim();
+      System.out.println();
       if (response.equals("Y") || response.equals("N")){
          ready = true;
          if(response.equals("N")){
-            gameLoop = false;
+            playingGame = false;
+            gameRepeat = false;
             System.out.println("Exiting Game");
          }
       }
