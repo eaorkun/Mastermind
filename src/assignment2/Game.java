@@ -207,6 +207,7 @@ public class Game
    {
       playingGame = true;
       printRules();
+      printGameConfig();
       Code secretCode = new Code(SecretCodeGenerator.getInstance().getNewSecretCode());
       boolean ready = false;
       while (!ready)
@@ -231,6 +232,23 @@ public class Game
    }
 
    /**
+    * Prints Game Configuration settings to the screen
+    */
+   private void printGameConfig()
+   {
+      System.out.println("Game Configurations:");
+      System.out.println("Total guesses - " + GameConfiguration.guessNumber);
+      System.out.print("Available Colors - ");
+      for (int i = 0; i < GameConfiguration.colors.length; ++i)
+      {
+         System.out.print(GameConfiguration.colors[i] + " ");
+      }
+      System.out.println();
+      System.out.println("Total Pegs - " + GameConfiguration.pegNumber);
+      System.out.println();
+   }
+
+   /**
     * Prompts the user on if they are ready to start the game
     *
     * @return returns true if further prompting is needed
@@ -238,7 +256,8 @@ public class Game
    private boolean promptReady()
    {
       boolean ready = false;
-      System.out.print("You have 12 guesses to figure out the secret code or you lose the\n" +
+      System.out.print("You have " + GameConfiguration.guessNumber
+         + " guesses to figure out the secret code or you lose the\n" +
          "game. Are you ready to play? (Y/N): ");
       String response = gameScanner.nextLine();
       response = response.toUpperCase();

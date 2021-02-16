@@ -1,15 +1,13 @@
-/* EE422C Assignment #2 submission by
+package assignment2;/* EE422C Assignment #2 submission by
  * Eralp Orkun
  * eao789
  * Lab Section: Unique #17110, (5-6:30pm Thursday)
  */
 
-import assignment2.Game;
-
 import java.util.Scanner;
 
 /**
- * Driver class used to run Mastermind, no instance of class required
+ * assignment2.Driver class used to run Mastermind, no instance of class required
  * EE422C programming assignment #2.
  * Lab Section: Unique #17110, (5-6:30pm Thursday)
  *
