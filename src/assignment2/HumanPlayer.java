@@ -8,7 +8,7 @@ public class HumanPlayer
    public HumanPlayer(){
       numGuesses = GameConfiguration.guessNumber;
    }
-   public int getGuesses()
+   public int getNumGuesses()
    {
       return numGuesses;
    }
@@ -18,7 +18,7 @@ public class HumanPlayer
       this.guess = guess;
    }
 
-   public void setGuesses(int numGuesses)
+   public void setNumGuesses(int numGuesses)
    {
       this.numGuesses = numGuesses;
    }

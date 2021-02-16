@@ -36,7 +36,7 @@ public class Game
                prompt = promptExtraGame();
             }
          }
-         else if(player.getGuesses() == 0){ //lost
+         else if(player.getNumGuesses() == 0){ //lost
             System.out.println("(Sorry, you are out of guesses. You lose, boo-hoo.)");
             boolean prompt = true;
             while(prompt){
@@ -45,7 +45,7 @@ public class Game
             playingGame = false;
          }
          else{ //regular turn based gameplay
-            System.out.println("You have " + player.getGuesses() + " guesses left.");
+            System.out.println("You have " + player.getNumGuesses() + " guesses left.");
 
             boolean validGuess = false;
             while(!validGuess){
@@ -67,6 +67,7 @@ public class Game
       System.out.println();
       if (guess.length() != GameConfiguration.pegNumber){
          validGuess = false;
+         processGuess(guess, validGuess);
          return validGuess;
       }
       else{
@@ -91,25 +92,36 @@ public class Game
 
    private void processGuess(String guess, boolean validGuess)
    {
-      System.out.print(guess + " -> ");
-      if(validGuess){
-         Code codeGuess = new Code(guess);
-         player.setGuess(codeGuess);
-         player.setGuesses(player.getGuesses()-1);
-         System.out.print("Result: ");
-         String result = gameBoard.getSecretCode().calculateFeedback(player.getGuess());
-         System.out.print(result);
-         if(gameBoard.getSecretCode().equals(player.getGuess())){
-            System.out.print(" - You win !!");
-            gameWon = true;
+      if(guess.equals("HISTORY")){
+         int length = gameBoard.getGuesses().size();
+         for(int i = 0; i < length; ++i){
+            System.out.println(gameBoard.getGuesses().get(i) + "\t\t"
+               + gameBoard.getFeedbacks().get(i));
          }
          System.out.println();
       }
-      else{
-         System.out.println("INVALID GUESS");
+      else {
+         System.out.print(guess + " -> ");
+         if(validGuess){
+            Code codeGuess = new Code(guess);
+            player.setGuess(codeGuess);
+            player.setNumGuesses(player.getNumGuesses()-1);
+            System.out.print("Result: ");
+            String result = gameBoard.getSecretCode().calculateFeedback(player.getGuess());
+            gameBoard.getGuesses().add(player.getGuess());
+            gameBoard.getFeedbacks().add(result);
+            System.out.print(result);
+            if(gameBoard.getSecretCode().equals(player.getGuess())){
+               System.out.print(" - You win !!");
+               gameWon = true;
+            }
+            System.out.println();
+         }
+         else{
+            System.out.println("INVALID GUESS");
+         }
+         System.out.println();
       }
-      System.out.println();
-
    }
 
    private boolean promptExtraGame()

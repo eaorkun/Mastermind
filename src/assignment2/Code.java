@@ -27,6 +27,34 @@ public class Code
 
    public String calculateFeedback(Code guess)
    {
-      return "String";
+      int blackPegs = 0;
+      int whitePegs = 0;
+      char[] guessString = guess.getCode().toCharArray();
+      char[] secretString = getCode().toCharArray();
+      for (int i = 0; i < GameConfiguration.pegNumber; ++i){
+         if(guessString[i] == secretString[i]){
+            guessString[i] = '-';
+            secretString[i] = '-';
+            ++blackPegs;
+         }
+      }
+      for (int i = 0; i < GameConfiguration.pegNumber; ++i){
+         if(guessString[i] != '-'){
+            for(int j = 0; j < GameConfiguration.pegNumber; ++j){
+               if(guessString[i] == secretString[j]){
+                  guessString[i] = '-';
+                  secretString[j] = '-';
+                  ++whitePegs;
+                  break;
+               }
+            }
+         }
+      }
+      return blackPegs + "B_" + whitePegs + "W";
+   }
+
+   private String getCode()
+   {
+      return code;
    }
 }
