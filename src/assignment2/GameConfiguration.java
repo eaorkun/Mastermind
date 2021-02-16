@@ -1,6 +1,7 @@
 /* EE422C Assignment #2 submission by
  * Eralp Orkun
  * eao789
+ * Lab Section: Unique #17110, (5-6:30pm Thursday)
  */
 
 package assignment2;

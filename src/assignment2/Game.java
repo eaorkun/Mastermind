@@ -1,19 +1,38 @@
+/* EE422C Assignment #2 submission by
+ * Eralp Orkun
+ * eao789
+ * Lab Section: Unique #17110, (5-6:30pm Thursday)
+ */
+
 package assignment2;
 
 import java.util.Scanner;
 
-
+/**
+ * Game class used to run Mastermind, high in hierarchy
+ * EE422C programming assignment #2.
+ * Lab Section: Unique #17110, (5-6:30pm Thursday)
+ *
+ * @author Eralp Orkun
+ * @version 1.01 02-16-2021
+ */
 
 public class Game
 {
+   private final boolean debugMode;
+   private final Scanner gameScanner;
    private boolean gameRepeat = true;
    private boolean playingGame = true;
-   private boolean debugMode;
    private boolean gameWon = false;
-   private Scanner gameScanner;
    private GameBoard gameBoard;
    private HumanPlayer player;
 
+   /**
+    * Game Constructor, takes in debug flag and a scanner for I/O
+    *
+    * @param debug      debug mode on/off
+    * @param curScanner used for I/O
+    */
 
    public Game(boolean debug, Scanner curScanner)
    {
@@ -22,42 +41,60 @@ public class Game
 
    }
 
+   /**
+    * Returns whether gameplay is set to repeat for another game
+    */
    public boolean isGameRepeat()
    {
       return gameRepeat;
    }
 
-   public void runGame(){
+   /**
+    * Complete play-through of the Mastermind game
+    */
+   public void runGame()
+   {
       initializeGame();
-      while (playingGame){
-         if(gameWon){ //won
+      while (playingGame)
+      { //while game in progress
+         if (gameWon)
+         { //if player has won the game
             boolean prompt = true;
-            while(prompt){
+            while (prompt)
+            { // keep prompting for valid response
                prompt = promptExtraGame();
             }
          }
-         else if(player.getNumGuesses() == 0){ //lost
+         else if (player.getNumGuesses() == 0)
+         { //if player has lost the game
             System.out.println("(Sorry, you are out of guesses. You lose, boo-hoo.)");
             boolean prompt = true;
-            while(prompt){
+            while (prompt)
+            {// keep prompting for valid response
                prompt = promptExtraGame();
             }
             playingGame = false;
          }
-         else{ //regular turn based gameplay
+         else
+         { //regular turn based gameplay
             System.out.println("You have " + player.getNumGuesses() + " guesses left.");
 
             boolean validGuess = false;
-            while(!validGuess){
+            while (!validGuess)
+            { //keep prompting for valid response
                System.out.println("What is your next guess?");
                System.out.println("Type in the characters for your guess and press enter.");
                validGuess = promptGuess();
             }
          }
       }
-
    }
 
+   /**
+    * Prompts the user for an I/O guess and processes accordingly
+    *
+    * @return Returns true if the guess was a valid guess
+    */
    private boolean promptGuess()
    {
       boolean validGuess = true;
@@ -65,23 +102,28 @@ public class Game
       String guess = gameScanner.nextLine();
       guess = guess.trim();
       System.out.println();
-      if (guess.length() != GameConfiguration.pegNumber){
+      if (guess.length() != GameConfiguration.pegNumber)
+      { //if size doesn't match, invalid
          validGuess = false;
          processGuess(guess, validGuess);
          return validGuess;
       }
-      else{
-         for(int i =0; i<guess.length(); ++i){
+      else
+      {
+         for (int i = 0; i < guess.length(); ++i)
+         { //iterate for each guess char
             char curChar = guess.charAt(i);
             boolean validChar = false;
-            for (int j = 0; j < GameConfiguration.colors.length; ++j){
-               if (curChar == GameConfiguration.colors[j].charAt(0))
+            for (int j = 0; j < GameConfiguration.colors.length; ++j)
+            { //iterates over all valid colors
+               if (curChar == GameConfiguration.colors[j].charAt(0)) //if current char is a color
                {
                   validChar = true;
                   break;
                }
             }
-            if(!validChar){
+            if (!validChar)
+            { //if not valid
                validGuess = false;
             }
          }
@@ -90,40 +132,57 @@ public class Game
       }
    }
 
+   /**
+    * Processes a guess and updates the game state accordingly
+    *
+    * @param guess      user input guess
+    * @param validGuess boolean condition reflecting if guess is valid
+    */
    private void processGuess(String guess, boolean validGuess)
    {
-      if(guess.equals("HISTORY")){
+      if (guess.equals("HISTORY"))
+      { //check for HISTORY input
          int length = gameBoard.getGuesses().size();
-         for(int i = 0; i < length; ++i){
+         for (int i = 0; i < length; ++i)
+         { //prints all elements in history
             System.out.println(gameBoard.getGuesses().get(i) + "\t\t"
                + gameBoard.getFeedbacks().get(i));
          }
          System.out.println();
       }
-      else {
+      else
+      {
          System.out.print(guess + " -> ");
-         if(validGuess){
+         if (validGuess)
+         { //if guess is valid
             Code codeGuess = new Code(guess);
             player.setGuess(codeGuess);
-            player.setNumGuesses(player.getNumGuesses()-1);
+            player.setNumGuesses(player.getNumGuesses() - 1);
             System.out.print("Result: ");
             String result = gameBoard.getSecretCode().calculateFeedback(player.getGuess());
             gameBoard.getGuesses().add(player.getGuess());
             gameBoard.getFeedbacks().add(result);
             System.out.print(result);
-            if(gameBoard.getSecretCode().equals(player.getGuess())){
+            if (gameBoard.getSecretCode().equals(player.getGuess()))
+            { //if guess matches secret code
                System.out.print(" - You win !!");
                gameWon = true;
             }
             System.out.println();
          }
-         else{
+         else
+         {
             System.out.println("INVALID GUESS");
          }
          System.out.println();
       }
    }
 
+   /**
+    * Prompts the user through I/O whether they want another Game
+    *
+    * @return returns true if program should continue prompting
+    */
    private boolean promptExtraGame()
    {
       boolean prompt = true;
@@ -131,7 +190,8 @@ public class Game
       String response = gameScanner.nextLine();
       response = response.toUpperCase();
       response = response.trim();
-      if (response.equals("Y") || response.equals("N")){
+      if (response.equals("Y") || response.equals("N"))
+      { //if valid response
          prompt = false;
          gameRepeat = response.equals("Y");
          gameWon = false;
@@ -140,29 +200,41 @@ public class Game
       return prompt;
    }
 
+   /**
+    * Initializes new unique game of Mastermind, run every new play-through
+    */
    private void initializeGame()
    {
       playingGame = true;
       printRules();
       Code secretCode = new Code(SecretCodeGenerator.getInstance().getNewSecretCode());
       boolean ready = false;
-      while (!ready){
+      while (!ready)
+      { //while invalid response
          ready = promptReady();
       }
       System.out.print("Generating secret code ... ");
-      if(debugMode){
+      if (debugMode)
+      { //if debugMode is on
          System.out.println("(for this example the secret code is " + secretCode + ")\n");
       }
-      else{
+      else
+      {
          System.out.println("\n");
       }
 
-      if(playingGame){
+      if (playingGame)
+      { // if game is in progress
          gameBoard = new GameBoard(secretCode);
          player = new HumanPlayer();
       }
    }
 
+   /**
+    * Prompts the user on if they are ready to start the game
+    *
+    * @return returns true if further prompting is needed
+    */
    private boolean promptReady()
    {
       boolean ready = false;
@@ -172,9 +244,11 @@ public class Game
       response = response.toUpperCase();
       response = response.trim();
       System.out.println();
-      if (response.equals("Y") || response.equals("N")){
+      if (response.equals("Y") || response.equals("N"))
+      { //if valid response
          ready = true;
-         if(response.equals("N")){
+         if (response.equals("N"))
+         { // if No was the response
             playingGame = false;
             gameRepeat = false;
             System.out.println("Exiting Game");
@@ -183,6 +257,9 @@ public class Game
       return ready;
    }
 
+   /**
+    * Prints the rules of Mastermind to the console.
+    */
    private static void printRules()
    {
       System.out.println("Welcome to Mastermind. Here are the rules.\n\n" +
