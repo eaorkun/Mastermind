@@ -32,7 +32,6 @@ public class Driver
       Game curGame = new Game(debug, curScanner);
       while (curGame.isGameRepeat())
       { //repeat full gameplays
-         System.out.println("Playing Game");
          curGame.runGame();
       }
    }
